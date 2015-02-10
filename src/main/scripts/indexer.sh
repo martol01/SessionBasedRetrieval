@@ -1,4 +1,4 @@
-gARCHIVE_NAME="archive.warc"
+ARCHIVE_NAME="archive.warc"
 OUTPUT_FOLDER="/Users/ralucamelon/Downloads/indri-5.0/outputIndex"
 
 echo "Param file: $1"
