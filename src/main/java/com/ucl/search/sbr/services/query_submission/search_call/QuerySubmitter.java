@@ -1,6 +1,8 @@
 package com.ucl.search.sbr.services.query_submission.search_call;
 
 /**
+ *
+ *
  * Created by Gabriel on 2/11/2015.
  */
 public class QuerySubmitter {
