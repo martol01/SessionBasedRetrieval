@@ -1,41 +1,56 @@
-ARCHIVE_NAME="archive.warc"
-OUTPUT_FOLDER="/Users/ralucamelon/Downloads/indri-5.0/outputIndex"
+#!/bin/bash
 
-echo "Param file: $1"
+USAGE="Usage: ./indexer.sh input_directory index_table_of_content_file"
+TEMP_ARCHIVE="archive.warc"
+TEMP_PARAM_FILE="param_file.xml"
+STOPWORDS_FILE="stopwords.xml"
 
-FILES="$1/*.warc.gz"
-for file in $FILES
+# Usage validation: check that the script was passed 2 parameters, both directories
+if [ "$#" -ne 2 ] || ! [ -d "$1" ]; then
+    echo ${USAGE}
+    exit 1
+fi
+
+INPUT_DIRECTORY=$1
+INDEX_FILE_PATH=$2
+
+echo "Folder containing archives: $INPUT_DIRECTORY"
+echo "Indri home directory: $INDEX_FILE_PATH"
+
+IFS=$'\t\n'
+FILES=(`find "${INPUT_DIRECTORY}" -name *.warc.gz`)
+for file in "${FILES[@]}"
 do
 	echo "Unzipping warc.gz file: $file"
 	# extract parameter file in
-	gunzip -c $file > $ARCHIVE_NAME
-	echo "<parameters> \
+	gunzip -c "${file}" > ${TEMP_ARCHIVE}
+	echo $"<parameters> \
 	     <memory>400m</memory> \
-	     <index>$OUTPUT_FOLDER</index> \
+	     <index>${INDEX_FILE_PATH}</index> \
 	     <stemmer> \
 	       <name>krovetz</name> \
 	     </stemmer> \
 	     <corpus> \
-	     <path>$ARCHIVE_NAME</path> \
-	     <class>warc</class> \
+	        <path>${TEMP_ARCHIVE}</path> \
+	        <class>warc</class> \
 	     </corpus> \
 	     <field><name>title</name></field> \
 	     <field><name>heading</name></field> \
 	     <field><name>body</name></field> \
 	     <metadata> \
-  				<forward>url</forward> \
-  				<backward>url</backward> \
-			 </metadata> \
-			</parameters>" > param_file.xml
+  	         <forward>url</forward> \
+  		 <backward>url</backward> \
+	     </metadata> \
+	</parameters>" > param_file.xml
 
 	# Run the indexer on the newly unzipped warc file.
 	echo "Indexing documents from warc file"
-	/Users/ralucamelon/Downloads/indri-5.0/buildindex/IndriBuildIndex param_file.xml stopwords.xml
+	IndriBuildIndex ${TEMP_PARAM_FILE} ${STOPWORDS_FILE}
 
 	# Cleaning up generated files
-	echo "Finished indexing $file. Cleaning generated files"
-	rm archive.warc
-	rm param_file.xml
+	echo "Finished indexing ${file}. Cleaning generated files"
+	rm ${TEMP_ARCHIVE}
+	rm ${TEMP_PARAM_FILE}
 done
 
 echo "All archives indexed successfully."
