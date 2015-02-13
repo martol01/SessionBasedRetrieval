@@ -8,12 +8,19 @@ apply plugin: 'application'
 sourceCompatibility = 1.7
 version = '1.0'
 
+def guavaVersion = '18.0'
+def junitVersion = '4.11'
+def xmlUnitVersion = '1.6'
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testCompile group: 'xmlunit', name: 'xmlunit', version: xmlUnitVersion
 }
 
 mainClassName = 'com.ucl.search.sbr.channles.main.EntryPoint'
