@@ -1,13 +1,15 @@
 package com.ucl.search.sbr.services.XMLParser;
 
+import java.util.List;
+
 /**
  * Created by root on 18/02/15.
  */
 public class Interaction {
 
     private String query;
-    private InteractionResult[] results;
-    private ClickedResult[] clicked;
+    private List<InteractionResult> results;
+    private List<ClickedResult> clicked;
     private String num;
     private String starttime;
     private String type;
@@ -20,19 +22,19 @@ public class Interaction {
         this.query = query;
     }
 
-    public InteractionResult[] getResults() {
+    public List<InteractionResult> getResults() {
         return results;
     }
 
-    public void setResults(InteractionResult[] results) {
+    public void setResults(List<InteractionResult> results) {
         this.results = results;
     }
 
-    public ClickedResult[] getClicked() {
+    public List<ClickedResult> getClicked() {
         return clicked;
     }
 
-    public void setClicked(ClickedResult[] clicked) {
+    public void setClicked(List<ClickedResult> clicked) {
         this.clicked = clicked;
     }
 

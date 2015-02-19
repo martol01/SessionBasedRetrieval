@@ -19,8 +19,8 @@ public class DexterConnection {
         HttpURLConnection conn = (HttpURLConnection) urlObject.openConnection();
         conn.setRequestMethod(method);
         int responseCode = conn.getResponseCode();
-        System.out.println("Sending "+method+"request to URL : " + url);
-        System.out.println("Response Code : " + responseCode);
+        //System.out.println("Sending "+method+"request to URL : " + url);
+        //System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(conn.getInputStream()));
@@ -70,11 +70,11 @@ public class DexterConnection {
             Gson gson = new Gson();
             AnnotateResponse res = gson.fromJson(String.valueOf(response), AnnotateResponse.class);
             Spot[] spots = res.getSpots();
-            System.out.println("Number of entities: "+spots.length);
+            //System.out.println("Number of entities: "+spots.length);
             for (int i = 0; i < spots.length; i++){
-                System.out.println(spots[i].getMention());
+                //System.out.println(spots[i].getMention());
             }
-            System.out.println();
+            //System.out.println();
 
         } catch (IOException e) {
             e.printStackTrace();

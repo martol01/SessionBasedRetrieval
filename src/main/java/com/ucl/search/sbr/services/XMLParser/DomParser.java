@@ -24,87 +24,62 @@ public class DomParser {
         Document document = builder.parse(ClassLoader.getSystemResourceAsStream(filename));
         List<Session> sessionsList = new ArrayList<Session>();
         NodeList nodeList = document.getDocumentElement().getChildNodes();
-        System.out.println(nodeList.getLength());
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
             if (node instanceof Element) {
-                Session session = new Session();
-                session.setNum(node.getAttributes().getNamedItem("num").getNodeValue());
-                session.setStarttime(node.getAttributes().getNamedItem("starttime").getNodeValue());
-                session.setUserid(node.getAttributes().getNamedItem("userid").getNodeValue());
-                NodeList childNodes = node.getChildNodes();
-                //System.out.println("CHILD NODES: " + childNodes.getLength());
-                //child 0 is always the topic, last child is always the currentquery
-                //extractTopicData(childNodes.item(0));
-                for (int j = 0; j < childNodes.getLength(); j++) {
-                    Node cNode = childNodes.item(j);
-                    if (cNode instanceof Element) {
-                       checkTag(session, cNode, ((Element) cNode).getTagName());
-                        //System.out.println(((Element) cNode).getTagName());
-                    }
-                }
-                //System.out.println("AL LENGTH: "+session.getInteractions().size());
-//                for (int j = 0; j < session.getInteractions().size(); j++) {
-//                    System.out.println("iQUERY: "+session.getInteractions().get(j).getQuery());
-//                }
-                //System.out.println("session topic: "+session.getTopic().getDesc());
-                //System.out.println("session curquery: "+session.getCurQuery().getQuery());
-                sessionsList.add(session);
+                sessionsList.add(extractSessionData(node));
                 break;
             }
         }
         return sessionsList;
     }
 
+    public Session extractSessionData(Node node) {
+        Session session = new Session();
+        session.setNum(node.getAttributes().getNamedItem("num").getNodeValue());
+        session.setStarttime(node.getAttributes().getNamedItem("starttime").getNodeValue());
+        session.setUserid(node.getAttributes().getNamedItem("userid").getNodeValue());
+        NodeList childNodes = node.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+           Node cNode = childNodes.item(j);
+           if (cNode instanceof Element) {
+               checkTag(session, cNode, ((Element) cNode).getTagName());
+           }
+        }
+        return session;
+    }
+
     public void checkTag(Session session, Node cNode, String tagName){
         //one topic and one current query per session, several interactions
-        if(tagName.equals("topic")){
-            session.setTopic(extractTopicData(cNode));
-        } else if(tagName.equals("interaction")){
-            //System.out.println("FOUND Interaction");
-            List<Interaction> interactions = session.getInteractions();
-            if(interactions == null){
-                interactions = new ArrayList<Interaction>();
-            }
-            interactions.add(extractInteractionData(cNode));
-        } else{
-            session.setCurQuery(extractCurrentQuery(cNode));
-            //System.out.println("FOUND CURQUERY");
+        switch (tagName){
+            case "topic":
+                session.setTopic(extractTopicData(cNode));
+                break;
+            case "interaction":
+                List<Interaction> interactions = session.getInteractions();
+                if(interactions == null){
+                    interactions = new ArrayList<Interaction>();
+                }
+                interactions.add(extractInteractionData(cNode));
+                break;
+            case "currentquery":
+                session.setCurQuery(extractCurrentQuery(cNode));
+                break;
         }
     }
 
     public CurrentQuery extractCurrentQuery(Node node){
-        System.out.println("CUR QUERY");
-        System.out.println(node);
         CurrentQuery curquery = new CurrentQuery();
         curquery.setStarttime(node.getAttributes().getNamedItem("starttime").getNodeValue());
         NodeList childNodes = node.getChildNodes();
-        System.out.println(childNodes.getLength());
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node cNode = childNodes.item(i);
             if(cNode instanceof Element){
-                System.out.println(cNode);
                 String query = cNode.getLastChild().getTextContent().trim();
                 curquery.setQuery(query);
             }
         }
         return curquery;
-    }
-    public void extractSessionData(NodeList nodeList) {
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
-            if (node instanceof Element) {
-                Session session = new Session();
-                session.setNum(node.getAttributes().getNamedItem("num").getNodeValue());
-                session.setStarttime(node.getAttributes().getNamedItem("starttime").getNodeValue());
-                session.setUserid(node.getAttributes().getNamedItem("userid").getNodeValue());
-                NodeList childNodes = node.getChildNodes();
-                //Topic topic = extractTopicData(childNodes);
-                //Interaction[] is = extractInteractions(childNodes);
-                //CurrentQuery curQuery = extractCurrentQuery(childNodes);
-
-            }
-        }
     }
 
     public Interaction extractInteractionData(Node node){
@@ -116,24 +91,114 @@ public class DomParser {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node cNode = childNodes.item(i);
             if(cNode instanceof Element){
-                System.out.println(cNode);
                 if(((Element) cNode).getTagName().equals("query")){
                     String query = cNode.getLastChild().getTextContent().trim();
                     interaction.setQuery(query);
                 }else{
-                  checkInteractionChild(cNode, ((Element) cNode).getTagName());
+                  checkInteractionChild(interaction, cNode, ((Element) cNode).getTagName());
                 }
             }
         }
         return interaction;
     }
 
-    public void checkInteractionChild(Node node, String tagName){
+
+    public void checkInteractionChild(Interaction interaction, Node node, String tagName){
         if(tagName.equals("results")) {
-          System.out.println("RESULTS");
+            interaction.setResults(extractResults(node));
         } else{
-            System.out.println("CLICKD");
+            interaction.setClicked(extractClicked(node));
         }
+    }
+
+    public List<ClickedResult> extractClicked(Node node){
+        List<ClickedResult> clicked = new ArrayList<ClickedResult>();
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node cNode = childNodes.item(i);
+            if(cNode instanceof Element){
+                clicked.add(extractClick(cNode));
+            }
+        }
+        return clicked;
+    }
+
+    public ClickedResult extractClick(Node node){
+        ClickedResult click = new ClickedResult();
+        click.setNum(node.getAttributes().getNamedItem("num").getNodeValue());
+        click.setStarttime(node.getAttributes().getNamedItem("starttime").getNodeValue());
+        click.setEndtime(node.getAttributes().getNamedItem("endtime").getNodeValue());
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength() ; i++) {
+            Node cNode = childNodes.item(i);
+            if(cNode instanceof Element){
+                checkClickChildren(click, cNode, ((Element) cNode).getTagName());
+            }
+        }
+        return click;
+    }
+
+    public void checkClickChildren(ClickedResult click, Node node, String tagName){
+        switch (tagName){
+            case "rank":
+                click.setRank(node.getLastChild().getTextContent().trim());
+                break;
+            case "docno":
+                click.setDocno(node.getLastChild().getTextContent().trim());
+                break;
+        }
+    }
+
+
+    public List<InteractionResult> extractResults(Node node){
+        List<InteractionResult> results = new ArrayList<InteractionResult>();
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node cNode = childNodes.item(i);
+            if(cNode instanceof Element){
+                results.add(extractResult(cNode));
+            }
+        }
+        return results;
+    }
+
+    public InteractionResult extractResult(Node node){
+
+        InteractionResult result = new InteractionResult();
+        result.setRank(node.getAttributes().getNamedItem("rank").getNodeValue());
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node cNode = childNodes.item(i);
+            if(cNode instanceof Element){
+               checkResultChildren(cNode, result, ((Element) cNode).getTagName());
+            }
+        }
+        return result;
+    }
+
+    public void checkResultChildren(Node node, InteractionResult result, String tagName){
+       switch (tagName){
+           case "url":
+               String url = node.getLastChild().getTextContent().trim();
+               result.setUrl(url);
+               break;
+           case "clueweb12id":
+               String clueweb = node.getLastChild().getTextContent().trim();
+               result.setClueweb12id(clueweb);
+               break;
+           case "title":
+               if(node.getLastChild()!=null) {
+                   String title = node.getLastChild().getTextContent().trim();
+                   result.setTitle(title);
+               }
+               break;
+           case "snippet":
+               if(node.getLastChild()!=null){
+                   String snippet = node.getLastChild().getTextContent().trim();
+                   result.setSnippet(snippet);
+               }
+               break;
+       }
     }
 
     public Topic extractTopicData(Node node){
