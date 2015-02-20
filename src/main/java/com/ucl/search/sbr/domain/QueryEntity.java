@@ -11,9 +11,10 @@ public class QueryEntity {
     private double weight = DEFAULT_WEIGHT;
     private String queryText;
 
-    // constructor
-    public QueryEntity(String query) {
-        queryText = query;
+
+    public QueryEntity(double weight, String queryText) {
+        this.weight = weight;
+        this.queryText = queryText;
     }
 
     // define the setters and getters
@@ -32,4 +33,5 @@ public class QueryEntity {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+
 }

@@ -8,6 +8,10 @@ apply plugin: 'application'
 sourceCompatibility = 1.7
 version = '1.0'
 
+def guavaVersion = '18.0'
+def junitVersion = '4.11'
+def xmlUnitVersion = '1.6'
+
 repositories {
     mavenCentral()
 }
