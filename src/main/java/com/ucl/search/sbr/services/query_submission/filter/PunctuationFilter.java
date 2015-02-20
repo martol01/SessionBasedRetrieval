@@ -6,14 +6,25 @@ import java.util.List;
 
 /**
  * Filter that removes punctuation from entities' query text
- *
+ * <p/>
  * Created by Gabriel on 2/11/2015.
  */
 public class PunctuationFilter implements Filter {
 
+
+    public PunctuationFilter() {
+    }
+
+
     @Override
     public List<QueryEntity> filterEntities(List<QueryEntity> entities) {
-        return null;
+
+        for (QueryEntity entity : entities) {
+            String filteredQueryText = entity.getQueryText().replaceAll("[^a-zA-Z0-9\\s]", "");
+            entity.setQueryText(filteredQueryText);
+        }
+
+        return entities;
     }
 
 }

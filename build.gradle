@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile files('/usr/local/share/indri/indri.jar')
 }
 
 mainClassName = 'com.ucl.search.sbr.channles.main.EntryPoint'
