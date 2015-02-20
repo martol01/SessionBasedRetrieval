@@ -3,10 +3,8 @@ package com.ucl.search.sbr.services.query_submission;
 import junit.framework.TestCase;
 import lemurproject.indri.QueryRequest;
 import lemurproject.indri.QueryResults;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class QueryRunnerTest extends TestCase {
 
 
