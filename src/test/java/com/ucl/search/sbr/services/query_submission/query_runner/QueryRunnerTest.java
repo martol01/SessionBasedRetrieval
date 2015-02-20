@@ -9,19 +9,6 @@ import org.junit.Test;
 
 public class QueryRunnerTest extends TestCase {
 
-//    private QueryRunner queryRunner;
-//    private QueryBuilder builder;
-//    private QueryRequest request;
-//
-//
-//    @Before
-//    public void createObjInstance() {
-//
-//        queryRunner = new QueryRunner();
-//        builder = new QueryBuilder();
-//        request = new QueryRequest();
-//    }
-
 
     /* test the properties of query request and check the results (format, total number of docs retrieved etc) */
     @Test
