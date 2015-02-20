@@ -1,0 +1,7 @@
+<parameters>
+    <index>/path/to/index/file</index>
+    <query><text>#combine( first_query_term second_query_term third_query_term )</text></query>
+    <memory>256M</memory>
+    <count>50</count>
+    <trecFormat>true</trecFormat>
+</parameters>

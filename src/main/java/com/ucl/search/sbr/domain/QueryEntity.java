@@ -12,6 +12,10 @@ public class QueryEntity {
     private String queryText;
 
 
+    public QueryEntity(String queryText) {
+        this(1, queryText);
+    }
+
     public QueryEntity(double weight, String queryText) {
         this.weight = weight;
         this.queryText = queryText;

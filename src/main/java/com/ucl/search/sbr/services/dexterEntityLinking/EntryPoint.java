@@ -1,6 +1,8 @@
 package com.ucl.search.sbr.services.dexterEntityLinking;
 
-import XMLParser.*;
+import com.ucl.search.sbr.services.XMLParser.DomParser;
+import com.ucl.search.sbr.services.XMLParser.Interaction;
+import com.ucl.search.sbr.services.XMLParser.Session;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

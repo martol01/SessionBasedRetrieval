@@ -8,6 +8,7 @@ apply plugin: 'application'
 sourceCompatibility = 1.7
 version = '1.0'
 
+def gsonVersion = '2.3.1'
 def guavaVersion = '18.0'
 def junitVersion = '4.11'
 def xmlUnitVersion = '1.6'
@@ -17,8 +18,12 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
     compile files('/usr/local/share/indri/indri.jar')
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'xmlunit', name: 'xmlunit', version: xmlUnitVersion
 }
 
 mainClassName = 'com.ucl.search.sbr.channles.main.EntryPoint'
