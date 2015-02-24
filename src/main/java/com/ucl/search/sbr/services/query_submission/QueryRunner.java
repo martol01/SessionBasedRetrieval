@@ -16,7 +16,7 @@ public class QueryRunner {
         QueryEnvironment env = new QueryEnvironment();
 
         try {
-            env.addIndex("/home/gabriel/kits/lemur/indexes/clueweb/");
+            env.addIndex("/usr/local/index/");
         } catch (Exception e) {
             e.printStackTrace();
         }
