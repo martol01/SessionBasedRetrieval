@@ -9,7 +9,10 @@
 *.iws
 *.ipr
 
-# Gradle generated files
+# Gradle generated files and project binaries
 build/
 .gradle/
-/bin/
+bin/
+out/
+
+*.log
