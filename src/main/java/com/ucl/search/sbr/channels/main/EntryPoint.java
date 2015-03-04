@@ -1,6 +1,9 @@
 package com.ucl.search.sbr.channels.main;
 
-import com.ucl.search.sbr.services.dexterEntityLinking.DexterConnection;
+
+import com.ucl.search.sbr.domain.EntityInteraction;
+import com.ucl.search.sbr.services.entityExtraction.Interaction;
+import com.ucl.search.sbr.services.entityExtraction.Session;
 
 /**
  * Created by Martin on 04/02/2015.
@@ -8,8 +11,15 @@ import com.ucl.search.sbr.services.dexterEntityLinking.DexterConnection;
 public class EntryPoint {
     public static void main(String args[]) {
         System.out.println("Hello World!");
-        DexterConnection conn = new DexterConnection();
-        String url = "http://localhost:8080/dexter-webapp/api/rest/get-id?title=Johnny_Cash";
-        conn.extractEntityId(url);
+        EntityInteraction entInteraction = new EntityInteraction();
+        Session[] sessions = entInteraction.getSessions();
+        for (Session session:sessions){
+            Interaction[] interactions = session.getInteractions();
+            for(Interaction interaction: interactions){
+                entInteraction.printEntitiesForInteraction(interaction);
+            }
+        }
+
+
     }
 }
