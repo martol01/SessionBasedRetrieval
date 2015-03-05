@@ -13,12 +13,13 @@ public class EntryPoint {
         System.out.println("Hello World!");
         EntityInteraction entInteraction = new EntityInteraction();
         Session[] sessions = entInteraction.getSessions();
-        for (Session session:sessions){
-            Interaction[] interactions = session.getInteractions();
-            for(Interaction interaction: interactions){
-                entInteraction.printEntitiesForInteraction(interaction);
-            }
-        }
+        System.out.println(sessions.length);
+//        for (Session session:sessions){
+//            Interaction[] interactions = session.getInteractions();
+//            for(Interaction interaction: interactions){
+//                entInteraction.printEntitiesForInteraction(interaction);
+//            }
+//        }
 
 
     }
