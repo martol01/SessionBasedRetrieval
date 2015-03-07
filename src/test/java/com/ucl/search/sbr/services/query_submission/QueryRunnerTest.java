@@ -1,8 +1,8 @@
 package com.ucl.search.sbr.services.query_submission;
 
 import junit.framework.TestCase;
+import lemurproject.indri.ParsedDocument;
 import lemurproject.indri.QueryRequest;
-import lemurproject.indri.QueryResults;
 import org.junit.Test;
 
 public class QueryRunnerTest extends TestCase {
@@ -26,12 +26,12 @@ public class QueryRunnerTest extends TestCase {
         assertEquals(expectedQueryString, request.query);
         assertEquals(nbOfResults, request.resultsRequested);
 
-
-        QueryResults results = queryRunner.submitQuery(request);
+        ParsedDocument[] results = queryRunner.submitQuery(request);
 
         ResultHandler handler = new ResultHandler();
         handler.handleResult(results);
 
-        assertTrue(results.results.length == nbOfResults);
+        assertTrue(results.length == nbOfResults);
+
     }
 }

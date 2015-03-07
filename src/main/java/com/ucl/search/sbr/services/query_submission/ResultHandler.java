@@ -1,31 +1,22 @@
 package com.ucl.search.sbr.services.query_submission;
 
-import lemurproject.indri.QueryResult;
-import lemurproject.indri.QueryResults;
+import lemurproject.indri.ParsedDocument;
 
 /**
  * Created by Gabriel on 2/11/2015.
  */
 public class ResultHandler {
 
-    public ResultHandler(){}
+    public ResultHandler() {
+    }
 
-    public void handleResult(QueryResults results) {
+    public void handleResult(ParsedDocument[] results) {
 
-        /* print the document name, score and snippet */
-
-        QueryResult[] queryRes = results.results;
-
-             /* iterate over the results and print them */
-        for (QueryResult result : queryRes) {
-            System.out.println("document name: " + result.documentName);
-            System.out.println();
-            System.out.println(" score of doc " + result.score);
-            System.out.println();
-            System.out.println(" snippet: " + result.snippet);
-            System.out.println();
+        /* iterate over the results and print the document content */
+        for (ParsedDocument doc : results) {
+            System.out.println(doc.content);
+            //System.out.println(doc.text);
         }
-
     }
 
 }

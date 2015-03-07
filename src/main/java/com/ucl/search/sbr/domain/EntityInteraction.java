@@ -17,7 +17,7 @@ public class EntityInteraction {
     private Session[] sessions;
 
     public EntityInteraction(){
-        String pathToFile ="/home/martin/SessionBasedRetrieval/src/main/resources/sessions.json";
+        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/sessions.json";
         gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(

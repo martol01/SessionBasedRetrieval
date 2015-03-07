@@ -2,7 +2,6 @@ package com.ucl.search.sbr.channels.main;
 
 
 import com.ucl.search.sbr.domain.EntityInteraction;
-import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.entityExtraction.Session;
 
 /**

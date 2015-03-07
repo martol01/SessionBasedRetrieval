@@ -15,7 +15,9 @@ public class QueryBuilder {
         req.query = query;
         req.resultsRequested = resultsNb;
 
-        //req.options = req.TextSnippet; //alternative one is TextSnippet
+        //req.options = one of QueryRequest.HTMLSnippet or QueryRequest.TextSnippet. HTML snippet uses <strong> tags to highlight matched terms in the snippet. Text snippet uses UPPERCASE to highlight matched terms.
+        //req.options = req.TextSnippet;
+
         return req;
     }
 
