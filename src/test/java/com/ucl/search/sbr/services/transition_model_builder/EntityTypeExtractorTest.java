@@ -1,10 +1,13 @@
 package com.ucl.search.sbr.services.transition_model_builder;
 
 import com.ucl.search.sbr.domain.EntityInteraction;
+import com.ucl.search.sbr.services.entityExtraction.Entity;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.entityExtraction.Session;
 import junit.framework.TestCase;
 import org.junit.Test;
+
+import java.util.List;
 
 public class EntityTypeExtractorTest extends TestCase {
 
@@ -15,25 +18,75 @@ public class EntityTypeExtractorTest extends TestCase {
 
         EntityInteraction entInteraction = new EntityInteraction();
         Session[] sessions = entInteraction.getSessions();
+        EntityTypeExtractor extractor = new EntityTypeExtractor();
 
-
-        for (Session session:sessions){
+        for (Session session : sessions) {
 
             System.out.println();
             System.out.println("Session id: " + session.getId());
             Interaction[] interactions = session.getInteractions();
-            System.out.println("session has: " + interactions.length + " queries.");
+
+            /* check if it makes sense to calculate theme, added and removed entities */
+            if (interactions.length > 1) {
+
+                /* calculate the theme, added and removed entities for each pair of queries */
+                for (int i = 0; i < interactions.length - 1; i++) {
 
 
-            for(Interaction interaction: interactions){
-                System.out.println("entities for query: " + interaction.getQuery());
-                entInteraction.printEntitiesForInteraction(interaction);
-                System.out.println();
+                    Entity[] Eq1 = interactions[i].getEntities();
+                    Entity[] Eq2 = interactions[i+1].getEntities();
+
+//                    System.out.println();
+//                    System.out.println("for query '" + interactions[i].getQuery() + "' the entities are: ");
+//
+//                    for (Entity e : Eq1) {
+//                        System.out.print(e.getMention() + " , ");
+//                    }
+//
+//                    System.out.println();
+//                    System.out.println("for query '" + interactions[i+1].getQuery() + "' the entities are: ");
+//
+//                    for (Entity e : Eq2) {
+//                        System.out.print(e.getMention() + " , ");
+//                    }
+
+
+                    List<Entity> themeE = extractor.extractThemeEntities(interactions[i], interactions[i + 1]);
+                    List<Entity> addedE = extractor.extractAddedEntities(interactions[i], interactions[i + 1]);
+                    List<Entity> removedE = extractor.extractRemovedEntities(interactions[i],interactions[i+1]);
+
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("the theme entities are: ");
+                    for (Entity e : themeE) {
+                        System.out.println(e.getMention());
+                    }
+
+                    System.out.println();
+                    System.out.println("the added entities are: ");
+                    for (Entity e : addedE) {
+                        System.out.println(e.getMention());
+                    }
+
+                    System.out.println();
+                    System.out.println("the removed entities are: ");
+                    for(Entity e: removedE){
+                        System.out.println(e.getMention());
+                    }
+
+                    /* with these values for the i-th query we need to apply RL */
+                    /*    and adjust the weights according to the policies     */
+
+
+                }
+
+
             }
+
         }
 
-        assertTrue(sessions.length == 1257);
 
+        assertTrue(sessions.length == 1257);
 
 
     }
