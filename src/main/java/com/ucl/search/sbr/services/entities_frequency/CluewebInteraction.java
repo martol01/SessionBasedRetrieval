@@ -19,15 +19,6 @@ public class CluewebInteraction {
                     new FileReader(pathToFile));
             //convert the json string back to object
             docs = gson.fromJson(br, CluewebDocument[].class);
-            System.out.println("DOCS LENGTH: "+docs.length);
-            for (int i = 0; i < docs.length; i++) {
-                System.out.println(docs[i].getDocid());
-                CluewebEntity[] entities = docs[i].getEntities();
-                for (int j = 0; j < entities.length; j++) {
-                    System.out.println(entities[j].getMention()+", "+entities[j].getValue());
-                }
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,21 +33,19 @@ public class CluewebInteraction {
         }
         return null;
     }
-    public void getCorpusEntities(){
+
+    public CluewebEntity[] getCorpusEntities(){
         String pathToFile ="/home/martin/SessionBasedRetrieval/src/main/resources/corpus_entities_frequency.json";
         Gson gson = new Gson();
-        CluewebEntity[] entities;
+        CluewebEntity[] entities = null;
         try {
             BufferedReader br = new BufferedReader(
                     new FileReader(pathToFile));
             //convert the json string back to object
             entities = gson.fromJson(br, CluewebEntity[].class);
-            System.out.println("DOCS LENGTH: "+entities.length);
-            for (int i = 0; i < entities.length; i++) {
-                System.out.println(entities[i].getMention()+", "+entities[i].getValue());
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return entities;
     }
 }
