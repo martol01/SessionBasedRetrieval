@@ -36,19 +36,19 @@ public class EntityTypeExtractorTest extends TestCase {
                     Entity[] Eq1 = interactions[i].getEntities();
                     Entity[] Eq2 = interactions[i+1].getEntities();
 
-//                    System.out.println();
-//                    System.out.println("for query '" + interactions[i].getQuery() + "' the entities are: ");
-//
-//                    for (Entity e : Eq1) {
-//                        System.out.print(e.getMention() + " , ");
-//                    }
-//
-//                    System.out.println();
-//                    System.out.println("for query '" + interactions[i+1].getQuery() + "' the entities are: ");
-//
-//                    for (Entity e : Eq2) {
-//                        System.out.print(e.getMention() + " , ");
-//                    }
+                    System.out.println();
+                    System.out.println("for query '" + interactions[i].getQuery() + "' the entities are: ");
+
+                    for (Entity e : Eq1) {
+                        System.out.print(e.getMention() + " , ");
+                    }
+
+                    System.out.println();
+                    System.out.println("for query '" + interactions[i+1].getQuery() + "' the entities are: ");
+
+                    for (Entity e : Eq2) {
+                        System.out.print(e.getMention() + " , ");
+                    }
 
 
                     List<Entity> themeE = extractor.extractThemeEntities(interactions[i], interactions[i + 1]);
