@@ -1,0 +1,54 @@
+[
+  {
+    "docid": "1",
+    "entities": [
+      {
+        "mention": "fashion show",
+        "value": "2"
+      },
+      {
+        "mention": "adriana lima",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "docid": "2",
+    "entities": [
+      {
+        "mention": "london",
+        "value": "5"
+      },
+      {
+        "mention": "trafalgar square",
+        "value": "2"
+      }
+    ]
+  },
+  {
+    "docid": "3",
+    "entities": [
+      {
+        "mention": "steven gerrard",
+        "value": "5"
+      },
+      {
+        "mention": "liverpool",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "docid": "4",
+    "entities": [
+      {
+        "mention": "machine learning",
+        "value": "4"
+      },
+      {
+        "mention": "supervised learning",
+        "value": "2"
+      }
+    ]
+  }
+]
