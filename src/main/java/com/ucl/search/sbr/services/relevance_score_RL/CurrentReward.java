@@ -44,15 +44,13 @@ public class CurrentReward {
 
         /* get the entity representation for the current query (interaction) */
         Entity[] entities = query.getEntities();
-//
+
 //        for(Entity e : entities){
 //            System.out.println(e.getMention());
 //        }
 
         /* go through all the documents and find the one with the right id */
         for (CluewebDocument doc : documents) {
-
-            System.out.println(doc.getDocid());
 
             /* check if the document is the one needed for the reward calculation */
             if(doc.getDocid().equals(docId)){

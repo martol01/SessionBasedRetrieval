@@ -37,7 +37,7 @@ public class EntityTypeExtractorTest extends TestCase {
                     Entity[] Eq2 = interactions[i+1].getEntities();
 
                     System.out.println();
-                    System.out.println("for query '" + interactions[i].getQuery() + "' the entities are: ");
+                    System.out.println("for query '" + interactions[i].getQuery() + "with id: " + interactions[i].getNum() + "' the entities are: ");
 
                     for (Entity e : Eq1) {
                         System.out.print(e.getMention() + " , ");

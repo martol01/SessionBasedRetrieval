@@ -18,7 +18,7 @@ public class CurrentRewardTest extends TestCase {
         String docId = "2";
 
         CurrentReward reward = new CurrentReward();
-        double currentReward = reward.calculateCurrentReward(query, docId);
+        //double currentReward = reward.calculateCurrentReward(query, docId);
 
         //System.out.println(currentReward);
 
