@@ -28,6 +28,12 @@ public class CurrentRelevance {
         }
     }
 
+
+    public long getSomeCount(){
+        System.out.println(entityMetricsProvider.getEntityText("/m/0100n9"));
+        return entityMetricsProvider.getEntityCorpusCount("/m/0100n9");
+    }
+
     /**
      * Returns the current reward(relevance) between query and document
      * This method will be called for each query and each document from the
@@ -39,12 +45,6 @@ public class CurrentRelevance {
      *                      simpleMLEflag: (true -> simple MLE; false -> score includes corpus information)
      * @return current reward
      */
-
-    public long getSomeCount(){
-        System.out.println(entityMetricsProvider.getEntityText("/m/0100n9"));
-        return entityMetricsProvider.getEntityCorpusCount("/m/0100n9");
-    }
-
     public double calculateCurrentRelevance(Interaction query, String docId, boolean simpleMLEflag) {
 
         /**
@@ -69,7 +69,7 @@ public class CurrentRelevance {
             if (simpleMLEflag == false) {
                 probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityCorpusCount("/m/01007s"), entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId)));
             } else {
-                // probabilities.add(getEntityProbabilityDoc(getEntityDocumentCount(e.id, docId), getDocumentLength(docId)));
+                probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId)));
             }
 
         }
@@ -98,5 +98,19 @@ public class CurrentRelevance {
     public double getEntityProbabilityDoc(long entityOccurence, long docLen) {
 
         return ((double) entityOccurence) / ((double) docLen);
+    }
+
+    /**
+     * returns the simple P(e|d) = #(e|d) / |d|
+     *
+     * @param e the entity whose probability needs to be calculated
+     * @param docId document id
+     * @return the new probability value P(e|d) calculated with maximum likelihood estimation
+     * */
+    public double getEntityProbabilityDoc(Entity e, String docId) {
+
+        /* change here with actual entity id */
+        return getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId));
+
     }
 }
