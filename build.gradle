@@ -20,6 +20,7 @@ repositories {
 dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version: gsonVersion
     compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
     compile files('/usr/local/share/indri/indri.jar')
 
     testCompile group: 'junit', name: 'junit', version: junitVersion
