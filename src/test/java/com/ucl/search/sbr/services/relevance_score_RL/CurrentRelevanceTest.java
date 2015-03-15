@@ -6,23 +6,24 @@ import com.ucl.search.sbr.services.entityExtraction.Session;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-public class CurrentRewardTest extends TestCase {
+public class CurrentRelevanceTest extends TestCase {
 
     @Test
-    public void testRewardCalculator() throws Exception {
+    public void testCurrentRelevance(){
 
-        /* preparing the test data; here I used the first query in the first session from TREC14 */
+         /* preparing the test data; here I used the first query in the first session from TREC14 */
         EntityInteraction entInteraction = new EntityInteraction();
         Session[] sessions = entInteraction.getSessions();
         Interaction query = sessions[0].getInteractions()[0];
-        String docId = "2";
 
-        CurrentReward reward = new CurrentReward();
-        //double currentReward = reward.calculateCurrentReward(query, docId);
 
-        //System.out.println(currentReward);
+        CurrentRelevance reward = new CurrentRelevance();
+        long a = reward.getSomeCount();
+
+        System.out.println(a);
 
         assertTrue(true == true);
+
     }
 
 }

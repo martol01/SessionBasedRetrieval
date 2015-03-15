@@ -1,5 +1,7 @@
 package com.ucl.search.sbr.services.entityDb;
 
+import java.util.List;
+
 /**
  * Wrapper for returning entity metrics for Clueweb documents.
  *
@@ -41,4 +43,12 @@ public interface EntityMetricsProvider {
      * @return number of entity occurrences in the document
      */
     public long getDocumentLength(String documentId);
+
+    /**
+     * Checks if the entity occurs in the documents specified in the docIds list
+     * @param entityId Freebase id of the entity
+     * @param docIds Clueweb ids for the documents that need to be checked
+     * @return true if the entity occurs in any of the docs; false otherwise
+     */
+    public boolean checkEntityOccurence(String entityId, List<String> docIds);
 }

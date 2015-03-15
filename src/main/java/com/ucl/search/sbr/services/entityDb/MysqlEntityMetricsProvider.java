@@ -165,6 +165,11 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         return documentLength;
     }
 
+    @Override
+    public boolean checkEntityOccurence(String entityId, List<String> docIds) {
+        return false;
+    }
+
     public void close() throws IOException, SQLException {
         List<PreparedStatement> allStatements = Arrays.asList(entityCorpusCountStatement, corpusLengthStatement,
                 entityTextStatement, entityDocumentCountStatement, documentLengthStatement);
