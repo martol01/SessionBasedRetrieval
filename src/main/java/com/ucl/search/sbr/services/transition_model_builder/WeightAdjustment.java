@@ -1,7 +1,6 @@
 package com.ucl.search.sbr.services.transition_model_builder;
 
 import com.ucl.search.sbr.services.entityExtraction.Entity;
-import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.relevance_score_RL.CurrentRelevance;
 
 /**
@@ -18,7 +17,7 @@ public class WeightAdjustment {
     /**
      * Calculates the new weight for the theme entity
      *
-     * @param query       query under evaluation
+     * @param e           entity under evaluation
      * @param docId       document id for the document under evaluation
      * @param maxRelDocId the id of the document with the max relevance from the previously 10 retrieved docs
      * @return the new weight for the theme entity
