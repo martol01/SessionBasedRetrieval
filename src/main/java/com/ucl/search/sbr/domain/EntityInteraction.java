@@ -17,7 +17,11 @@ public class EntityInteraction {
     private Session[] sessions;
 
     public EntityInteraction(){
+<<<<<<< HEAD
         String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/fbaseTagged.json";
+=======
+        String pathToFile ="/home/martin/SessionBasedRetrieval/src/main/resources/fbaseTagged.json";
+>>>>>>> 3925a85dda118fe7a570f09887c3645e37978ad3
         gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(
