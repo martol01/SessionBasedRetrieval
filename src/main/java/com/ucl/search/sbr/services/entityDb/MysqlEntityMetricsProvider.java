@@ -3,10 +3,7 @@ package com.ucl.search.sbr.services.entityDb;
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,17 +13,21 @@ import java.util.List;
  * Created by gabriel on 15/03/15.
  */
 public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
-
     private static final String DATABASE_NAME = "clueweb_entities";
-
     private Connection connection;
     private PreparedStatement entityCorpusCountStatement;
     private PreparedStatement corpusLengthStatement;
     private PreparedStatement entityTextStatement;
     private PreparedStatement entityDocumentCountStatement;
     private PreparedStatement documentLengthStatement;
+    private Statement entityOccurrenceStatement;
+    private PreparedStatement entityDocumentFrequencyStatement;
 
+    // entity occurrence count in corpus
     private Long corpusLength = null;
+    // number of documents in corpus
+    private Long documentCount = null;
+    private CacheMap<String, Double> entityIdfs;
 
     public MysqlEntityMetricsProvider(String host, String username, String password) throws SQLException {
         MysqlDataSource dataSource = new MysqlDataSource();
@@ -35,7 +36,9 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         dataSource.setCreateDatabaseIfNotExist(false);
 
         connection = dataSource.getConnection(username, password);
+
         prepareStatements();
+        entityIdfs = new CacheMap<>(50);
     }
 
     private void prepareStatements() throws SQLException {
@@ -46,6 +49,9 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
                 "SELECT `count` FROM DocumentsEntities WHERE document_id=? AND entity_id=?;");
         documentLengthStatement = connection.prepareStatement(
                 "SELECT total_count FROM DocumentsTotalEntities WHERE document_id=?;");
+        entityOccurrenceStatement = connection.createStatement();
+        entityDocumentFrequencyStatement = connection.prepareStatement(
+                "SELECT COUNT(document_id) AS document_frequency FROM DocumentsEntities WHERE entity_id=?;");
     }
 
     @Override
@@ -67,7 +73,6 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             } catch (SQLException ignored) {
             }
         }
-
         return count;
     }
 
@@ -75,7 +80,6 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
     public long getCorpusLength() {
         if (corpusLength != null)
             return corpusLength;
-
         ResultSet rs = null;
         try {
             rs = corpusLengthStatement.executeQuery();
@@ -88,10 +92,9 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
                 if (rs != null) {
                     rs.close();
                 }
-            } catch (NullPointerException|SQLException ignored) {
+            } catch (NullPointerException | SQLException ignored) {
             }
         }
-
         return corpusLength;
     }
 
@@ -114,7 +117,6 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             } catch (SQLException ignored) {
             }
         }
-
         return entityText;
     }
 
@@ -138,7 +140,6 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             } catch (SQLException ignored) {
             }
         }
-
         return entityDocumentCount;
     }
 
@@ -161,23 +162,99 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             } catch (SQLException ignored) {
             }
         }
-
         return documentLength;
     }
 
     @Override
-    public boolean checkEntityOccurence(String entityId, List<String> docIds) {
-        return false;
+    public boolean checkEntityOccurrence(String entityId, List<String> docIds) {
+        int docSize = docIds.size();
+        if (docSize == 0)
+            return false;
+
+        StringBuilder inClause = new StringBuilder("(");
+        for (int i = 0; i < docSize - 1; i++) {
+            inClause.append("'").append(docIds.get(i)).append("',");
+        }
+        inClause.append("'").append(docIds.get(docSize-1)).append("'");
+        inClause.append(")");
+        String query = String.format("SELECT COUNT(*) AS occurrence_count FROM DocumentsEntities " +
+                "WHERE entity_id='%s' AND document_id IN %s;", entityId, inClause);
+
+        long count = 0;
+        ResultSet rs = null;
+        try {
+            rs = entityOccurrenceStatement.executeQuery(query);
+            rs.first();
+            count = rs.getLong("occurrence_count");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+        }
+
+        return count > 0;
+    }
+
+    @Override
+    public double getEntityIdf(String entityId) {
+        if (entityIdfs.containsKey(entityId))
+            return entityIdfs.get(entityId);
+
+        double idf = Math.log((double) getDocumentCount() / getEntityDocumentFrequency(entityId));
+        entityIdfs.put(entityId, idf);
+        return idf;
+    }
+
+    private long getEntityDocumentFrequency(String entityId) {
+        long df = 0;
+        ResultSet rs = null;
+        try {
+            entityDocumentFrequencyStatement.setString(1, entityId);
+            rs = entityDocumentFrequencyStatement.executeQuery();
+            rs.first();
+            df = rs.getLong("document_frequency");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (rs != null)
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+        }
+
+        return df;
+    }
+
+    private long getDocumentCount() {
+        if (documentCount != null)
+            return documentCount;
+
+        try (
+                Statement stmt = connection.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS document_count FROM DocumentsTotalEntities;")
+        ) {
+            rs.first();
+            documentCount = rs.getLong("document_count");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return documentCount;
     }
 
     public void close() throws IOException, SQLException {
-        List<PreparedStatement> allStatements = Arrays.asList(entityCorpusCountStatement, corpusLengthStatement,
-                entityTextStatement, entityDocumentCountStatement, documentLengthStatement);
-        for (PreparedStatement statement : allStatements) {
+        List<Statement> allStatements = Arrays.asList(entityCorpusCountStatement,
+                corpusLengthStatement, entityTextStatement, entityDocumentCountStatement,
+                documentLengthStatement, entityOccurrenceStatement, entityDocumentFrequencyStatement);
+        for (Statement statement : allStatements) {
             if (!statement.isClosed())
                 statement.close();
         }
-
         if (!connection.isClosed())
             connection.close();
     }
