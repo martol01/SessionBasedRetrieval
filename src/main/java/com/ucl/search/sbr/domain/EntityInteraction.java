@@ -17,7 +17,7 @@ public class EntityInteraction {
     private Session[] sessions;
 
     public EntityInteraction(){
-        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/sessions.json";
+        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/fbaseTagged.json";
         gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(
@@ -50,6 +50,7 @@ public class EntityInteraction {
         Entity[] entities = interaction.getEntities();
         for (Entity entity:entities){
             System.out.println(entity.getMention());
+            System.out.println(entity.getMid());
         }
     }
 

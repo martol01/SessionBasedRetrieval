@@ -79,7 +79,7 @@ public class OverallRelevanceScore {
 
         for (Entity e : addedE) {
             /** if the entity occurs in RDi-1*/
-            if (mysqlMetricsProvider.checkEntityOccurence(e.getMention(), RDids)) {
+            if (mysqlMetricsProvider.checkEntityOccurrence(e.getMention(), RDids)) {
                 addedEntityCase1 += weightAdjuster.getNewWeight_AddedEntity1(e, docId, maxDocId);
             } else {
                 //addedEntityCase2 += weightAdjuster.getNewWeight_AddedEntity2(e ,docId, maxDocId);
