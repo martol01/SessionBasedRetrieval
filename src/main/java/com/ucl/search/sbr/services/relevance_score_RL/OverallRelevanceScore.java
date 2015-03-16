@@ -1,11 +1,9 @@
 package com.ucl.search.sbr.services.relevance_score_RL;
 
-import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Entity;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
-import com.ucl.search.sbr.services.transition_model_builder.WeightAdjustment;
 
-import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -22,22 +20,10 @@ public class OverallRelevanceScore {
     private final float C = (float) 0.07;
     private final float D = (float) 0.4;
 
-    private final String host = "localhost";
-    private final String username = "root";
-    private final String password = "";
-
     private CurrentRelevance currentRelevance;
-    private WeightAdjustment weightAdjuster;
-    private MysqlEntityMetricsProvider mysqlMetricsProvider;
 
     public OverallRelevanceScore() {
         this.currentRelevance = new CurrentRelevance();
-        this.weightAdjuster = new WeightAdjustment();
-        try {
-            this.mysqlMetricsProvider = new MysqlEntityMetricsProvider(host, username, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -49,24 +35,22 @@ public class OverallRelevanceScore {
      * @param themeE   a list with the theme entities identified for the current query
      * @param addedE   a list with the added entities identified for the current query
      * @param removedE a list with the removed entities identified for the current query
-     * @param maxDocId the id of the document with max relevance value from the previously retrieved docs
-     * @param RDids    a list with document ids for the top 10 relevant documents that were previously retrieved
-     *
+     * @param weights  HashMap containing <entityId, entityWeight>; the updated weights through RL for each entity
      * @return the newly calculated score between query and document Score(q,d)
      */
-    public double getNewScore(Interaction query, String docId, List<Entity> themeE, List<Entity> addedE, List<Entity> removedE, String maxDocId, List<String> RDids) {
+    public double getNewScore(Interaction query, String docId, List<Entity> themeE, List<Entity> addedE, List<Entity> removedE, HashMap<String, Double> weights) {
 
         double newScore = 0.0;
 
         /* get the current score between query and document */
         double currentScore = currentRelevance.calculateCurrentRelevance(query, docId, false);
-        currentScore = Math.log10(currentScore);
+        currentScore = Math.log(currentScore);
 
         /** treat the theme entities case and apply the formula (sum all new weights for all theme entities) */
         double themeEntityCase = 0.0;
 
         for (Entity e : themeE) {
-            themeEntityCase += weightAdjuster.getNewWeight_ThemeEntity(e, docId, maxDocId);
+            themeEntityCase += weights.get(e.getMid());
         }
 
 
@@ -78,19 +62,14 @@ public class OverallRelevanceScore {
         double addedEntityCase2 = 0.0;
 
         for (Entity e : addedE) {
-            /** if the entity occurs in RDi-1*/
-            if (mysqlMetricsProvider.checkEntityOccurrence(e.getMention(), RDids)) {
-                addedEntityCase1 += weightAdjuster.getNewWeight_AddedEntity1(e, docId, maxDocId);
-            } else {
-                //addedEntityCase2 += weightAdjuster.getNewWeight_AddedEntity2(e ,docId, maxDocId);
-            }
+            addedEntityCase1 += weights.get(e.getMid());
         }
 
         /** treat the removed entities case and apply the formula (sum all new weights for all removed entities) */
         double removedEntityCase = 0.0;
 
         for (Entity e : removedE) {
-            removedEntityCase += weightAdjuster.getNewWeight_RmEntity(e, docId, maxDocId);
+            removedEntityCase += weights.get(e.getMid());
         }
 
         /**Overall relevance score between query and document after RL weight adjustment */
@@ -110,7 +89,7 @@ public class OverallRelevanceScore {
     public double getNewScore(Interaction query, String docId) {
 
         double currentScore = currentRelevance.calculateCurrentRelevance(query, docId, false);
-        currentScore = Math.log10(currentScore);
+        currentScore = Math.log(currentScore);
 
         return currentScore;
     }

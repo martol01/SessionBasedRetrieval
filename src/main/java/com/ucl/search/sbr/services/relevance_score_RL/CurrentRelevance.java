@@ -51,9 +51,7 @@ public class CurrentRelevance {
          * used to store the probabilities calculated with maximum likehood estimation with dirichlet smoothing parameter
          * -> one probability for each entity in the entity representation of a query
          **/
-
         List<Double> probabilities = new ArrayList<>();
-        double probabilityProduct = 1.0;
 
         /** get the entity representation for the current query **/
         Entity[] entities = query.getEntities();
@@ -65,19 +63,23 @@ public class CurrentRelevance {
          **/
 
         for (Entity e : entities) {
-            /* change here to get the entity id before calling the function */
             if (simpleMLEflag == false) {
-                probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityCorpusCount("/m/01007s"), entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId)));
+                probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityCorpusCount(e.getMid()),
+                        entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId)));
             } else {
-                probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId)));
+                probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId),
+                        entityMetricsProvider.getDocumentLength(docId)));
             }
-
         }
 
         /** go through the 'probabilities' array and calculate P(qi|d) = current reward **/
+        double probabilityProduct = 1.0;
         for (Double prob : probabilities) {
             probabilityProduct *= (1.0 - prob);
         }
+
+        System.out.println("prob product is P(qi,d) = " + probabilityProduct);
+        System.out.println("returned val is (1-P(qi,d)) = " + (1-probabilityProduct));
 
         return (1.0 - probabilityProduct);
     }
@@ -109,8 +111,7 @@ public class CurrentRelevance {
      * */
     public double getEntityProbabilityDoc(Entity e, String docId) {
 
-        /* change here with actual entity id */
-        return getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount("/m/01007s", docId), entityMetricsProvider.getDocumentLength(docId));
+        return getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId));
 
     }
 }

@@ -5,7 +5,7 @@ import java.util.TreeMap;
 /**
  * Created by gabriel on 15/03/15.
  */
-public class CacheMap<K,V> extends TreeMap<K,V> {
+class CacheMap<K,V> extends TreeMap<K,V> {
 
     private int cacheMaxSize;
 
