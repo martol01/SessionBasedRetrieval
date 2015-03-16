@@ -18,9 +18,9 @@ public class CurrentRelevanceTest extends TestCase {
 
 
         CurrentRelevance reward = new CurrentRelevance();
-        long a = reward.getSomeCount();
+       // long a = reward.getSomeCount();
 
-        System.out.println(a);
+        //System.out.println(a);
 
         assertTrue(true == true);
 

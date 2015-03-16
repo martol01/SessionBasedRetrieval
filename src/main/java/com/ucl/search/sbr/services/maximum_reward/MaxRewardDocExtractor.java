@@ -18,7 +18,7 @@ public class MaxRewardDocExtractor {
     public MaxRewardDocExtractor() {}
 
     /**
-     * 1. Submits the query to indri and retrieves the first 100 documents
+     * 1. Submits the query to indri and retrieves the first 10 documents
      * 2. For each document retrieved it calculated the score between doc and the query
      * 3. Builds the HashMap between docId and the score calculated at step 2
      * HashMap will look something like:
