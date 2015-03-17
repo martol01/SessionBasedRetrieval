@@ -5,6 +5,7 @@ import com.ucl.search.sbr.services.query_submission.QuerySubmitter;
 import com.ucl.search.sbr.services.relevance_score_RL.CurrentRelevance;
 import lemurproject.indri.ParsedDocument;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,13 +38,13 @@ public class MaxRewardDocExtractor {
         double score;
 
         QuerySubmitter querySubmitter = new QuerySubmitter();
-        ParsedDocument[] results = querySubmitter.getResultsForQuery(query.getQuery(), 100);
+        ParsedDocument[] results = querySubmitter.getResultsForQuery(query.getQuery(), 10);
 
         /* for each document in results compute the score(query,doc) and store it in the HashMap */
         for(ParsedDocument doc : results){
             String docId = new String((byte[])doc.metadata.get("docno"));
 
-            System.out.println(new String((byte[])doc.metadata.get("docno")));
+            //System.out.println(new String((byte[])doc.metadata.get("docno")));
 
             score = relevanceScore.calculateCurrentRelevance(query, docId, MLE_BASED_SCORE);
             queryDocScore.put(docId, score);
@@ -67,6 +68,18 @@ public class MaxRewardDocExtractor {
         }
 
         return maxRewardingDocID;
+    }
+
+    public ArrayList<String> getRDids(HashMap<String, Double> queryDocScore){
+
+        ArrayList<String> RDids = new ArrayList<>(queryDocScore.keySet());
+
+        System.out.println("the array of ids for RDi is :");
+        for(String s: RDids){
+            System.out.println(s);
+        }
+
+        return RDids;
     }
 
 }
