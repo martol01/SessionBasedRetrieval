@@ -61,10 +61,11 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         try {
             entityCorpusCountStatement.setString(1, id);
             rs = entityCorpusCountStatement.executeQuery();
-            rs.first();
+            if (!rs.first())
+                return 0;
             count = rs.getLong("corpus_count");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return 0;
         } finally {
             try {
                 if (rs != null) {
@@ -105,7 +106,8 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         try {
             entityTextStatement.setString(1, entityId);
             rs = entityTextStatement.executeQuery();
-            rs.first();
+            if (!rs.first())
+                return null;
             entityText = rs.getString("text");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -129,7 +131,8 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             entityDocumentCountStatement.setString(1, documentId);
             entityDocumentCountStatement.setString(2, entityId);
             rs = entityDocumentCountStatement.executeQuery();
-            rs.first();
+            if (!rs.first())
+                return 0;
             entityDocumentCount = rs.getLong("count");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -151,7 +154,8 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         try {
             documentLengthStatement.setString(1, documentId);
             rs = documentLengthStatement.executeQuery();
-            rs.first();
+            if (!rs.first())
+                return 0;
             documentLength = rs.getLong("total_count");
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -179,7 +183,7 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         inClause.append("'").append(docIds.get(docSize-1)).append("'");
         inClause.append(")");
         String query = String.format("SELECT COUNT(*) AS occurrence_count FROM DocumentsEntities " +
-                "WHERE entity_id='%s' AND document_id IN %s;", entityId, inClause);
+                "WHERE document_id IN %s AND entity_id='%s';", inClause, entityId);
 
         long count = 0;
         ResultSet rs = null;

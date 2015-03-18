@@ -25,7 +25,8 @@ public interface EntityMetricsProvider {
      * Get the Freebase text representation of the entity with specified id
      *
      * @param entityId Freebase identifier of entity
-     * @return the text representation of the entity
+     * @return the text representation of the entity. Returns {@code null}
+     *         if no entity with specified identifier is found
      */
     public String getEntityText(String entityId);
 
