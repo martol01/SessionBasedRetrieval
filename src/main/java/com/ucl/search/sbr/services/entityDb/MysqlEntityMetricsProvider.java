@@ -123,6 +123,7 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
     @Override
     public long getEntityDocumentCount(String entityId, String documentId) {
         long entityDocumentCount = 0;
+        System.out.println("trying to get getEntityDocCount with entity id : " + entityId +" and doc id: " + documentId);
         ResultSet rs = null;
         try {
             entityDocumentCountStatement.setString(1, documentId);

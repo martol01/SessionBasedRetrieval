@@ -211,13 +211,17 @@ public class EntryPoint {
             } else {
                 Entity[] entities = interactions[0].getEntities();
 
+                for(Entity e: entities){
+                    System.out.println(e.getMention());
+                }
+
                 QuerySubmitter querySubmitter = new QuerySubmitter();
                 ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getQuery(), 10);
 
                 /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId */
                 for (ParsedDocument doc : results) {
                     String docId = new String((byte[]) doc.metadata.get("docno"));
-                    System.out.println(new String((byte[]) doc.metadata.get("docno")));
+                    System.out.println("doc id: " + docId);
 
                     HashMap<String, Double> value = entityWeight.get(docId);
 

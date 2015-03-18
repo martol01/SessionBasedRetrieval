@@ -44,7 +44,7 @@ public class MaxRewardDocExtractor {
         for(ParsedDocument doc : results){
             String docId = new String((byte[])doc.metadata.get("docno"));
 
-            //System.out.println(new String((byte[])doc.metadata.get("docno")));
+            System.out.println(new String((byte[])doc.metadata.get("docno")));
 
             score = relevanceScore.calculateCurrentRelevance(query, docId, MLE_BASED_SCORE);
             queryDocScore.put(docId, score);

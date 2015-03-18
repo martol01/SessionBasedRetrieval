@@ -18,7 +18,7 @@ public class EntityInteraction {
 
     public EntityInteraction(){
 
-        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/fbaseTagged.json";
+        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/freebaseEntities.json";
         gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(
