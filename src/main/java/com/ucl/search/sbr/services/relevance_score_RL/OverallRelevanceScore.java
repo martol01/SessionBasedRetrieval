@@ -54,7 +54,7 @@ public class OverallRelevanceScore {
         }
 
 
-        /** treat the added entities cases:
+        /* treat the added entities cases:
          * case1: added entity belongs to RDi-1 (previously retrieved relevant docs)
          * case2: added entity DOESN'T belong to RDi-1 (previously retrieved relevant docs)
          * and apply the formula (sum all new weights for each case)  */

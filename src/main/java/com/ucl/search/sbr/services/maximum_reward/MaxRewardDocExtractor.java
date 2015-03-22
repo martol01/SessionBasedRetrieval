@@ -7,7 +7,6 @@ import lemurproject.indri.ParsedDocument;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by ralucamelon on 14/03/2015.
@@ -34,7 +33,6 @@ public class MaxRewardDocExtractor {
 
         HashMap<String, Double> queryDocScore = new HashMap<>();
         CurrentRelevance relevanceScore = new CurrentRelevance();
-
         double score;
 
         QuerySubmitter querySubmitter = new QuerySubmitter();
@@ -43,10 +41,8 @@ public class MaxRewardDocExtractor {
         /* for each document in results compute the score(query,doc) and store it in the HashMap */
         for(ParsedDocument doc : results){
             String docId = new String((byte[])doc.metadata.get("docno"));
-
-            System.out.println(new String((byte[])doc.metadata.get("docno")));
-
             score = relevanceScore.calculateCurrentRelevance(query, docId, MLE_BASED_SCORE);
+            // System.out.println("in maximing hashmap : score is: " + score);
             queryDocScore.put(docId, score);
         }
 
@@ -54,16 +50,16 @@ public class MaxRewardDocExtractor {
     }
 
 
-    /** returns the id of the document with the maximim value in the HashTable (maximim reward) */
+    /** returns the id of the document with the maximum value in the HashTable (maximum reward) */
     public String getMaxRewardingDoc(HashMap<String, Double> scores) {
 
-        String maxRewardingDocID = null;
+        String maxRewardingDocID = new String();
         Double maxRelevanceScore = Double.MIN_VALUE;
 
-        for(Map.Entry<String, Double> score : scores.entrySet()){
-            if(score.getValue() > maxRelevanceScore){
-                maxRelevanceScore = score.getValue();
-                maxRewardingDocID = score.getKey();
+        for(String key : scores.keySet()){
+            if(scores.get(key) > maxRelevanceScore){
+                maxRelevanceScore = scores.get(key);
+                maxRewardingDocID = key;
             }
         }
 
@@ -74,10 +70,10 @@ public class MaxRewardDocExtractor {
 
         ArrayList<String> RDids = new ArrayList<>(queryDocScore.keySet());
 
-        System.out.println("the array of ids for RDi is :");
-        for(String s: RDids){
-            System.out.println(s);
-        }
+//        System.out.println("the array of ids for RDi is :");
+//        for(String s: RDids){
+//            System.out.println(s);
+//        }
 
         return RDids;
     }

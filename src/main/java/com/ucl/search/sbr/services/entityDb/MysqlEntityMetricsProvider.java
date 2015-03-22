@@ -125,7 +125,6 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
     @Override
     public long getEntityDocumentCount(String entityId, String documentId) {
         long entityDocumentCount = 0;
-        System.out.println("trying to get getEntityDocCount with entity id : " + entityId +" and doc id: " + documentId);
         ResultSet rs = null;
         try {
             entityDocumentCountStatement.setString(1, documentId);
@@ -149,10 +148,12 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
 
     @Override
     public long getDocumentLength(String documentId) {
+
         long documentLength = 0;
         ResultSet rs = null;
         try {
-            documentLengthStatement.setString(1, documentId);
+            // trimming document id - sometimes has trailing whitespaces, which causes query to return empty set
+            documentLengthStatement.setString(1, documentId.trim());
             rs = documentLengthStatement.executeQuery();
             if (!rs.first())
                 return 0;
@@ -167,6 +168,7 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
             } catch (SQLException ignored) {
             }
         }
+
         return documentLength;
     }
 
