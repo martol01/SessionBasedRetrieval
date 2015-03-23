@@ -24,6 +24,18 @@ public class Interaction {
         this.query = query;
     }
 
+    public String getEntityQuery() {
+        if (entities.length < 2)
+            return query;
+
+        StringBuilder queryBuilder = new StringBuilder();
+        for (int i=0; i<entities.length - 1; i++) {
+            queryBuilder.append(entities[i].getMention()).append(" ");
+        }
+        queryBuilder.append(entities[entities.length - 1]);
+        return queryBuilder.toString();
+    }
+
     public Entity[] getEntities() {
         return entities;
     }

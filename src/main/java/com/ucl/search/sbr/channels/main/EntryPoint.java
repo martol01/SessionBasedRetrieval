@@ -81,7 +81,7 @@ public class EntryPoint {
                     List<Entity> addedE = extractor.extractAddedEntities(interactions[i], interactions[i + 1]);
                     List<Entity> removedE = extractor.extractRemovedEntities(interactions[i], interactions[i + 1]);
 
-                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[i + 1].getQuery(), 10);
+                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[i + 1].getEntityQuery(), 10);
 
                     /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId
                     * if and only if that entity doesn't appear in the HashTable */
@@ -251,7 +251,7 @@ public class EntryPoint {
                 System.out.println("in else: here the session has only one query");
 
                 Entity[] entities = interactions[0].getEntities();
-                ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getQuery(), 10);
+                ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getEntityQuery(), 10);
 
                 /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId */
                 for (ParsedDocument doc : results) {

@@ -41,7 +41,7 @@ public class MaxRewardDocExtractor {
         double score;
 
         QuerySubmitter querySubmitter = new QuerySubmitter();
-        ParsedDocument[] results = querySubmitter.getResultsForQuery(query.getQuery(), 10);
+        ParsedDocument[] results = querySubmitter.getResultsForQuery(query.getEntityQuery(), 10);
 
         /* for each document in results compute the score(query,doc) and store it in the HashMap */
         for(ParsedDocument doc : results){
@@ -58,7 +58,7 @@ public class MaxRewardDocExtractor {
     /** returns the id of the document with the maximum value in the HashTable (maximum reward) */
     public String getMaxRewardingDoc(HashMap<String, Double> scores) {
 
-        String maxRewardingDocID = new String();
+        String maxRewardingDocID = "";
         Double maxRelevanceScore = Double.MIN_VALUE;
 
         for(String key : scores.keySet()){
