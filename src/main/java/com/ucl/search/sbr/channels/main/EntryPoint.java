@@ -52,9 +52,7 @@ public class EntryPoint {
 
 
         /** go through all the sessions */
-//        for (Session session : sessions) {
-        for (int si = 319; si < sessions.length; si++) {
-            Session session = sessions[si];
+        for (Session session : sessions) {
             System.out.println("Session id: " + session.getId());
             Interaction[] interactions = session.getInteractions();
 
