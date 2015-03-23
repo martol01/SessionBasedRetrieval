@@ -113,9 +113,11 @@ public class CurrentRelevance {
      * @return the new probability value P(e|d) calculated with maximum likelihood estimation
      * */
     public double getEntityProbabilityDoc(Entity e, String docId) {
-
-        double result = getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId));
-      //  System.out.println("simple P(e|d) mle: " + result);
-        return result;
+        //  System.out.println("simple P(e|d) mle: " + result);
+        double weight = getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId));
+        /* treat the case when Math.log(0.0) gives -Infinity */
+        if (weight == 0.0)
+            return 1;
+        return weight;
     }
 }
