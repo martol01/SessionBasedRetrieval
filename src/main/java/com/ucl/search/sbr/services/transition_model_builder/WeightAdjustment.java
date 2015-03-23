@@ -1,5 +1,6 @@
 package com.ucl.search.sbr.services.transition_model_builder;
 
+import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Entity;
 import com.ucl.search.sbr.services.relevance_score_RL.CurrentRelevance;
 
@@ -10,8 +11,8 @@ public class WeightAdjustment {
 
     private CurrentRelevance currentRelevance;
 
-    public WeightAdjustment() {
-        this.currentRelevance = new CurrentRelevance();
+    public WeightAdjustment(MysqlEntityMetricsProvider mysqlEntityMetricsProvider) {
+        this.currentRelevance = new CurrentRelevance(mysqlEntityMetricsProvider);
     }
 
     /**

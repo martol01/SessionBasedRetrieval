@@ -1,5 +1,6 @@
 package com.ucl.search.sbr.services.query_submission;
 
+import com.google.common.base.CharMatcher;
 import lemurproject.indri.*;
 
 /**
@@ -19,7 +20,7 @@ public class QueryRunner {
             e.printStackTrace();
         }
 
-        /* run the query and get the results */
+        sanitiseQueryRequest(request);
         QueryResults results = env.runQuery(request);
         QueryResult[] queryRes = results.results;
 
@@ -33,7 +34,6 @@ public class QueryRunner {
         /* get the parsed documents based on their ids */
         try {
             ParsedDocument[] parsedDocs = env.documents(docIds);
-            System.out.println(parsedDocs.length);
             return parsedDocs;
 
         } catch (Exception e) {
@@ -43,4 +43,10 @@ public class QueryRunner {
         env.close();
         return null;
     }
+
+    private void sanitiseQueryRequest(QueryRequest request) {
+        request.query = CharMatcher.anyOf(":;@+-_=<>|~?!()/\\,.\"\'").removeFrom(request.query);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.ucl.search.sbr.services.maximum_reward;
 
+import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.query_submission.QuerySubmitter;
 import com.ucl.search.sbr.services.relevance_score_RL.CurrentRelevance;
@@ -15,7 +16,12 @@ public class MaxRewardDocExtractor {
 
     private final boolean MLE_BASED_SCORE = true;
 
-    public MaxRewardDocExtractor() {}
+
+    private CurrentRelevance relevanceScore;
+
+    public MaxRewardDocExtractor(MysqlEntityMetricsProvider entityMetricsProvider) {
+        this.relevanceScore = new CurrentRelevance(entityMetricsProvider);
+    }
 
     /**
      * 1. Submits the query to indri and retrieves the first 10 documents
@@ -32,7 +38,6 @@ public class MaxRewardDocExtractor {
     public HashMap<String, Double> buildQueryDocScore(Interaction query) {
 
         HashMap<String, Double> queryDocScore = new HashMap<>();
-        CurrentRelevance relevanceScore = new CurrentRelevance();
         double score;
 
         QuerySubmitter querySubmitter = new QuerySubmitter();

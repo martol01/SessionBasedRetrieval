@@ -21,53 +21,56 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Main class - fires up all the crap.
+ * <p/>
  * Created by Martin on 04/02/2015.
  */
 public class EntryPoint {
 
     private static final String host = "localhost";
     private static final String username = "root";
-    private static final String password = "";
+    private static final String password = "gogaie";
 
 
     public static void main(String args[]) {
 
-        EntityInteraction entInteraction = new EntityInteraction();
-        Session[] sessions = entInteraction.getSessions();
-        EntityTypeExtractor extractor = new EntityTypeExtractor();
-        WeightAdjustment weightAdjuster = new WeightAdjustment();
-        CurrentRelevance currentWeight = new CurrentRelevance();
-        MaxRewardDocExtractor maxRewardExtractor = new MaxRewardDocExtractor();
-        OverallRelevanceScore overallScore = new OverallRelevanceScore();
         MysqlEntityMetricsProvider mysqlMetricsProvider = null;
         try {
             mysqlMetricsProvider = new MysqlEntityMetricsProvider(host, username, password);
         } catch (SQLException e) {
             e.printStackTrace();
+            System.exit(-1);
         }
+        EntityInteraction entInteraction = new EntityInteraction();
+        Session[] sessions = entInteraction.getSessions();
+        EntityTypeExtractor extractor = new EntityTypeExtractor();
+        MaxRewardDocExtractor maxRewardExtractor = new MaxRewardDocExtractor(mysqlMetricsProvider);
+        OverallRelevanceScore overallScore = new OverallRelevanceScore(mysqlMetricsProvider);
+        CurrentRelevance currentWeight = new CurrentRelevance(mysqlMetricsProvider);
+        WeightAdjustment weightAdjuster = new WeightAdjustment(mysqlMetricsProvider);
+        QuerySubmitter querySubmitter = new QuerySubmitter();
 
 
         /** go through all the sessions */
-        for (Session session : sessions) {
-
+//        for (Session session : sessions) {
+        for (int si = 319; si < sessions.length; si++) {
+            Session session = sessions[si];
             System.out.println("Session id: " + session.getId());
             Interaction[] interactions = session.getInteractions();
 
             /** stores (docId, <entityId, entityWeight in doc with docIds>); for each session we initialize a new hashMap(inside)*/
             Map<String, HashMap<String, Double>> entityWeight = new HashMap<>();
 
-            /** stores (queryId, <docId, score(q,d)>); for each session initilize a new HashMap(inside one) */
-            Map<String, HashMap<String, Double>> overallScorePerQuery = new HashMap<>();
+            /** stores (queryId, <docId, score(q,d)>); for each session initialise a new HashMap(inside one) */
+//            Map<String, HashMap<String, Double>> overallScorePerQuery = new HashMap<>();
 
-             System.out.println("nb de queries: " + interactions.length);
+            System.out.println("nb de queries: " + interactions.length);
             /* check if it makes sense to calculate theme, added and removed entities */
             if (interactions.length > 1) {
 
-                /* calculate the theme, added and removed entities for each pair of queries */
                 for (int i = 0; i < interactions.length - 1; i++) {
 
                     Entity[] Eq1 = interactions[i].getEntities();
-                    Entity[] Eq2 = interactions[i + 1].getEntities();
 
                     HashMap<String, Double> queryDocScore = maxRewardExtractor.buildQueryDocScore(interactions[i]);
                     /** get the id of the max rewarding document */
@@ -75,11 +78,11 @@ public class EntryPoint {
                     /** get the ids for the RD  */
                     ArrayList<String> RDids = maxRewardExtractor.getRDids(queryDocScore);
 
+                    /* calculate the theme, added and removed entities for each pair of queries */
                     List<Entity> themeE = extractor.extractThemeEntities(interactions[i], interactions[i + 1]);
                     List<Entity> addedE = extractor.extractAddedEntities(interactions[i], interactions[i + 1]);
                     List<Entity> removedE = extractor.extractRemovedEntities(interactions[i], interactions[i + 1]);
 
-                    QuerySubmitter querySubmitter = new QuerySubmitter();
                     ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[i + 1].getQuery(), 10);
 
                     /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId
@@ -94,17 +97,16 @@ public class EntryPoint {
                         }
 
                         /* if it is the first query calculate P(e|d) for each document */
-                        if(i==0){
+                        if (i == 0) {
 
                             for (Entity e : Eq1) {
-                               // System.out.println("entities in first query in session: " + e.getMid() + "   " + e.getMention());
+                                // System.out.println("entities in first query in session: " + e.getMid() + "   " + e.getMention());
                                 double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                                 /* treat the case when Math.log(0.0) gives -Infinity */
-                                if(entWeight == 0.0){
+                                if (entWeight == 0.0) {
                                     value.put(e.getMid(), 0.0);
-                                }
-                                else{
+                                } else {
                                     value.put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                                 }
                             }
@@ -114,11 +116,11 @@ public class EntryPoint {
                         /**
                          * THEME ENTITIES WEIGHT ADJUSTMENT AND STATS UPDATING
                          * */
-                       // System.out.println();
-                       // System.out.println("the theme entities are: ");
+                        // System.out.println();
+                        // System.out.println("the theme entities are: ");
 
                         for (Entity e : themeE) {
-                          //  System.out.println(e.getMention() + "   " + e.getMid());
+                            //  System.out.println(e.getMention() + "   " + e.getMid());
 
                             /* checks if the theme entity appears in the hashtable */
                             if (entityWeight.get(docId).containsKey(e.getMid())) {
@@ -134,26 +136,20 @@ public class EntryPoint {
                                 double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                                 /* treat the case when Math.log(0.0) gives -Infinity */
-                                if(entWeight == 0.0){
+                                if (entWeight == 0.0) {
                                     entityWeight.get(docId).put(e.getMid(), 0.0);
-                                }
-                                else{
+                                } else {
                                     entityWeight.get(docId).put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                                 }
 
                             }
                         }
 
-
-                        /**
-                         * ADDED ENTITIES WEIGHT ADJUSTMENT AND STATS UPDATING
-                         * */
-
                         // System.out.println();
-                       // System.out.println("the added entities are: ");
+                        // System.out.println("the added entities are: ");
 
                         for (Entity e : addedE) {
-                           // System.out.println(e.getMention() + "   " + e.getMid());
+                            // System.out.println(e.getMention() + "   " + e.getMid());
 
                             /** if the added entity belongs to RDi-1 (previously relevant documents) */
                             if (mysqlMetricsProvider.checkEntityOccurrence(e.getMid(), RDids) == true) {
@@ -168,10 +164,9 @@ public class EntryPoint {
                                     double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                                 /* treat the case when Math.log(0.0) gives -Infinity */
-                                    if(entWeight == 0.0){
+                                    if (entWeight == 0.0) {
                                         entityWeight.get(docId).put(e.getMid(), 0.0);
-                                    }
-                                    else{
+                                    } else {
                                         entityWeight.get(docId).put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                                     }
 
@@ -190,10 +185,9 @@ public class EntryPoint {
                                     double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                                 /* treat the case when Math.log(0.0) gives -Infinity */
-                                    if(entWeight == 0.0){
+                                    if (entWeight == 0.0) {
                                         entityWeight.get(docId).put(e.getMid(), 0.0);
-                                    }
-                                    else{
+                                    } else {
                                         entityWeight.get(docId).put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                                     }
 
@@ -202,17 +196,11 @@ public class EntryPoint {
                         }
 
 
-
-
-                        /**
-                         * REMOVED ENTITIES WEIGHT ADJUSTMENT AND STATS UPDATING
-                         * */
-
-                      //  System.out.println();
-                       // System.out.println("the removed entities are: ");
+                        //  System.out.println();
+                        // System.out.println("the removed entities are: ");
 
                         for (Entity e : removedE) {
-                          //  System.out.println(e.getMention() + "   " + e.getMid());
+                            //  System.out.println(e.getMention() + "   " + e.getMid());
 
                             if (entityWeight.get(docId).containsKey(e.getMid())) {
 
@@ -225,10 +213,9 @@ public class EntryPoint {
                                 double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                                 /* treat the case when Math.log(0.0) gives -Infinity */
-                                if(entWeight == 0.0){
+                                if (entWeight == 0.0) {
                                     entityWeight.get(docId).put(e.getMid(), 0.0);
-                                }
-                                else{
+                                } else {
                                     entityWeight.get(docId).put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                                 }
 
@@ -247,7 +234,7 @@ public class EntryPoint {
                                 themeE, addedE, removedE, entityWeight.get(docId)));
                     }
 
-                    overallScorePerQuery.put(interactions[i + 1].getNum(), scoreQueryDoc);
+//                    overallScorePerQuery.put(interactions[i + 1].getNum(), scoreQueryDoc);
 
                     if (i == 0) {
                         scoreQueryDoc = new HashMap<>();
@@ -258,7 +245,7 @@ public class EntryPoint {
                         }
 
                        /* populate first entry corresponding to first query with the scores for each doc */
-                        overallScorePerQuery.put(interactions[0].getNum(), scoreQueryDoc);
+//                        overallScorePerQuery.put(interactions[0].getNum(), scoreQueryDoc);
                     }
                 }
             } else {
@@ -266,7 +253,6 @@ public class EntryPoint {
                 System.out.println("in else: here the session has only one query");
 
                 Entity[] entities = interactions[0].getEntities();
-                QuerySubmitter querySubmitter = new QuerySubmitter();
                 ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getQuery(), 10);
 
                 /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId */
@@ -284,10 +270,9 @@ public class EntryPoint {
                         double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
 
                         /* treat the case when Math.log(0.0) gives -Infinity */
-                        if(entWeight == 0.0){
+                        if (entWeight == 0.0) {
                             entityWeight.get(docId).put(e.getMid(), 0.0);
-                        }
-                        else{
+                        } else {
                             entityWeight.get(docId).put(e.getMid(), Math.log(currentWeight.getEntityProbabilityDoc(e, docId)));
                         }
                     }
@@ -295,23 +280,25 @@ public class EntryPoint {
                 }
 
                 // just printing the values -- delete this part later
-                for (String key : entityWeight.keySet()) {
-                    for (String entityId : entityWeight.get(key).keySet()) {
-                        System.out.println( "map from docId -> (entityId, weightOfEntity)" + entityId + " ___ " + entityWeight.get(key).get(entityId));
-                    }
-                }
+//                for (String key : entityWeight.keySet()) {
+//                    for (String entityId : entityWeight.get(key).keySet()) {
+//                        System.out.println( "map from docId -> (entityId, weightOfEntity)" + entityId + " ___ " + entityWeight.get(key).get(entityId));
+//                    }
+//                }
 
-                HashMap<String, Double> scoreQueryDoc = new HashMap<>();
-
-                for (ParsedDocument doc : results) {
-                    String docId = new String((byte[]) doc.metadata.get("docno"));
-                    scoreQueryDoc.put(docId, overallScore.getNewScore(interactions[0], docId));
-                }
+//                HashMap<String, Double> scoreQueryDoc = new HashMap<>();
+//
+//                for (ParsedDocument doc : results) {
+//                    String docId = new String((byte[]) doc.metadata.get("docno"));
+//                    scoreQueryDoc.put(docId, overallScore.getNewScore(interactions[0], docId));
+//                }
 
                 /* populate first entry corresponding to first query with the scores for each doc */
-                overallScorePerQuery.put(interactions[0].getNum(), scoreQueryDoc);
+//                overallScorePerQuery.put(interactions[0].getNum(), scoreQueryDoc);
             }
 
+            entityWeight.clear();
         }
     }
+
 }

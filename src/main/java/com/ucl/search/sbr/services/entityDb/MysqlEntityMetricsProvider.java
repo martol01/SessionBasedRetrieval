@@ -14,6 +14,7 @@ import java.util.List;
  */
 public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
     private static final String DATABASE_NAME = "clueweb_entities";
+
     private Connection connection;
     private PreparedStatement entityCorpusCountStatement;
     private PreparedStatement corpusLengthStatement;
@@ -27,7 +28,7 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
     private Long corpusLength = null;
     // number of documents in corpus
     private Long documentCount = null;
-    private CacheMap<String, Double> entityIdfs;
+    //private CacheMap<String, Double> entityIdfs;
 
     public MysqlEntityMetricsProvider(String host, String username, String password) throws SQLException {
         MysqlDataSource dataSource = new MysqlDataSource();
@@ -38,7 +39,7 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
         connection = dataSource.getConnection(username, password);
 
         prepareStatements();
-        entityIdfs = new CacheMap<>(50);
+        //entityIdfs = new CacheMap<>(50);
     }
 
     private void prepareStatements() throws SQLException {
@@ -208,15 +209,15 @@ public class MysqlEntityMetricsProvider implements EntityMetricsProvider {
 
     @Override
     public double getEntityIdf(String entityId) {
-        if (entityIdfs.containsKey(entityId))
-            return entityIdfs.get(entityId);
+//        if (entityIdfs.containsKey(entityId))
+//            return entityIdfs.get(entityId);
 
         double idf = Math.log((double) getDocumentCount() / getEntityDocumentFrequency(entityId));
-        entityIdfs.put(entityId, idf);
+//        entityIdfs.put(entityId, idf);
         return idf;
     }
 
-    private long getEntityDocumentFrequency(String entityId) {
+    long getEntityDocumentFrequency(String entityId) {
         long df = 0;
         ResultSet rs = null;
         try {

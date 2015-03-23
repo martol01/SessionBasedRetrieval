@@ -23,7 +23,7 @@ class CacheMap<K,V> extends TreeMap<K,V> {
 
     private void reduceCache() {
         int size = size();
-        while (size > cacheMaxSize) {
+        while (size-- > cacheMaxSize) {
             remove(firstKey());
         }
     }

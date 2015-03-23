@@ -6,23 +6,24 @@ import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.entityExtraction.Session;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-/**
- * Created by root on 04/03/15.
- */
 public class EntityInteraction {
-    private Gson gson;
+
     private Session[] sessions;
 
-    public EntityInteraction(){
+    public EntityInteraction() {
 
-        String pathToFile ="/Users/ralucamelon/Documents/UCL3/ResearchMethods/SessionBasedRetrieval/src/main/resources/freebaseEntities.json";
-        gson = new Gson();
+        String pathToFile ="freebaseEntities.json";
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader.getResource(pathToFile).getFile());
+
+        Gson gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(
-                    new FileReader(pathToFile));
+                    new FileReader(file));
             //convert the json string back to object
             sessions = gson.fromJson(br, Session[].class);
         } catch (IOException e) {
@@ -32,27 +33,6 @@ public class EntityInteraction {
 
     public Session[] getSessions(){
         return this.sessions;
-    }
-
-    public Session getSession(int id){
-        return sessions[id];
-    }
-
-    public Interaction[] getInteractionsForSession(int sessionId){
-        Interaction[] interactions = sessions[sessionId].getInteractions();
-        return interactions;
-    }
-
-    public Entity[] getEntitiesForInteraction(Interaction interaction){
-        return interaction.getEntities();
-    }
-
-    public void printEntitiesForInteraction(Interaction interaction){
-        Entity[] entities = interaction.getEntities();
-        for (Entity entity:entities){
-            System.out.println(entity.getMention());
-            System.out.println(entity.getMid());
-        }
     }
 
 }

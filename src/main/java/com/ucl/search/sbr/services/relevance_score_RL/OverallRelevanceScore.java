@@ -1,5 +1,6 @@
 package com.ucl.search.sbr.services.relevance_score_RL;
 
+import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Entity;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
 
@@ -22,8 +23,8 @@ public class OverallRelevanceScore {
 
     private CurrentRelevance currentRelevance;
 
-    public OverallRelevanceScore() {
-        this.currentRelevance = new CurrentRelevance();
+    public OverallRelevanceScore(MysqlEntityMetricsProvider mysqlEntityMetricsProvider) {
+        this.currentRelevance = new CurrentRelevance(mysqlEntityMetricsProvider);
     }
 
     /**

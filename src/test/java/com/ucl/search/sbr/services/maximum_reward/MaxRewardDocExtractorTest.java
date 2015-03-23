@@ -1,20 +1,23 @@
 package com.ucl.search.sbr.services.maximum_reward;
 
 import com.ucl.search.sbr.domain.EntityInteraction;
+import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
 import com.ucl.search.sbr.services.entityExtraction.Session;
 import com.ucl.search.sbr.services.transition_model_builder.EntityTypeExtractor;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.sql.SQLException;
+
 public class MaxRewardDocExtractorTest extends TestCase {
 
 
     @Test
-    public void testMaxRewardDocExtractor(){
+    public void testMaxRewardDocExtractor() throws SQLException {
 
-
-        MaxRewardDocExtractor maxRewardextractor = new MaxRewardDocExtractor();
+        MysqlEntityMetricsProvider provider = new MysqlEntityMetricsProvider("localhost", "root", "gogaie");
+        MaxRewardDocExtractor maxRewardextractor = new MaxRewardDocExtractor(provider);
         EntityInteraction entInteraction = new EntityInteraction();
         EntityTypeExtractor extractor = new EntityTypeExtractor();
 

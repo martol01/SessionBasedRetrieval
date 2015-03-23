@@ -15,23 +15,9 @@ public class CurrentRelevance {
 
     private final int DIRICHLET_PARAM = 5000;
     private MysqlEntityMetricsProvider entityMetricsProvider;
-    private final String host = "localhost";
-    private final String username = "root";
-    private final String password = "";
 
-
-    public CurrentRelevance() {
-        try {
-            this.entityMetricsProvider = new MysqlEntityMetricsProvider(host, username, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public long getSomeCount(){
-       // System.out.println(entityMetricsProvider.getEntityText("/m/0100n9"));
-        return entityMetricsProvider.getEntityCorpusCount("/m/0100n9");
+    public CurrentRelevance(MysqlEntityMetricsProvider entityMetricsProvider) {
+        this.entityMetricsProvider = entityMetricsProvider;
     }
 
     /**

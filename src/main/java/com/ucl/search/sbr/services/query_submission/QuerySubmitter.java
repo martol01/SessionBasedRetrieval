@@ -7,6 +7,9 @@ import lemurproject.indri.ParsedDocument;
  */
 public class QuerySubmitter {
 
+    private QueryRunner queryRunner = new QueryRunner();
+    private QueryBuilder builder = new QueryBuilder();
+
     public QuerySubmitter(){}
 
     /** issues the query to indri and returns the results (baseline retrieval)
@@ -18,8 +21,6 @@ public class QuerySubmitter {
 
      public ParsedDocument[] getResultsForQuery(String query, int nbOfResults){
 
-        QueryRunner queryRunner = new QueryRunner();
-        QueryBuilder builder = new QueryBuilder();
         ParsedDocument[] results = new ParsedDocument[nbOfResults];
 
          try {
