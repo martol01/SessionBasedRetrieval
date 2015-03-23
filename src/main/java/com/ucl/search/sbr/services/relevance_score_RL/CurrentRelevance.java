@@ -4,7 +4,6 @@ import com.ucl.search.sbr.services.entityDb.MysqlEntityMetricsProvider;
 import com.ucl.search.sbr.services.entityExtraction.Entity;
 import com.ucl.search.sbr.services.entityExtraction.Interaction;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,13 +46,10 @@ public class CurrentRelevance {
          *  calculate P(e|d) and store the value in the 'probabilities' array
          *  -> probabilities will contain = {P(e1|d), P(e2|d), P(e3|d), P(e4|d), P(e5|d)}
          **/
-
-       // System.out.println("entities in product probability: ");
         for (Entity e : entities) {
-           // System.out.println(e.getMention() + "  " + e.getMid() + "  " + docId);
 
             if (simpleMLEflag == false) {
-               // System.out.println("in MLE false");
+                //System.out.println("in MLE false");
                 probabilities.add(getEntityProbabilityDoc(entityMetricsProvider.getEntityCorpusCount(e.getMid()),
                         entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId)));
             } else {
@@ -68,14 +64,12 @@ public class CurrentRelevance {
         /** go through the 'probabilities' array and calculate P(qi|d) = current reward **/
         double probabilityProduct = 1.0;
         for (Double prob : probabilities) {
-         //   System.out.println("probabilities list that need to be multiplied: " + prob);
+           // System.out.println("probabilities list that need to be multiplied: " + (1.0 - prob));
 
             probabilityProduct *= (1.0 - prob);
         }
 
-//        System.out.println("prob product is P(qi,d) = " + probabilityProduct);
-//        System.out.println("returned val is (1-P(qi,d)) = " + (1.0-probabilityProduct));
-
+        //System.out.println((1.0 - probabilityProduct) + " here is the CURRENT prob product val");
         return (1.0 - probabilityProduct);
     }
 
@@ -84,10 +78,11 @@ public class CurrentRelevance {
      */
     public double getEntityProbabilityDoc(double corpusP, long entityOccurence, long docLen) {
 
-        if(docLen == 0)
-            return 0;
+        //System.out.println("corpus P : " + corpusP);
+        double Ped = ((double) entityOccurence + DIRICHLET_PARAM * corpusP) / ((double) docLen + DIRICHLET_PARAM);
 
-        return ((double) entityOccurence + DIRICHLET_PARAM * corpusP) / ((double) docLen + DIRICHLET_PARAM);
+        //System.out.println("P(e|d) = " + Ped);
+        return Ped;
     }
 
     /**
@@ -97,10 +92,10 @@ public class CurrentRelevance {
      */
     public double getEntityProbabilityDoc(long entityOccurence, long docLen) {
 
-      //  System.out.println(entityOccurence + "  leng: " + docLen);
+       // System.out.println(entityOccurence + "  leng: " + docLen);
 
         if(docLen == 0)
-            return 0;
+            return 1.0;
 
         return ((double) entityOccurence) / ((double) docLen);
     }
@@ -116,8 +111,10 @@ public class CurrentRelevance {
         //  System.out.println("simple P(e|d) mle: " + result);
         double weight = getEntityProbabilityDoc(entityMetricsProvider.getEntityDocumentCount(e.getMid(), docId), entityMetricsProvider.getDocumentLength(docId));
         /* treat the case when Math.log(0.0) gives -Infinity */
-        if (weight == 0.0)
+        if (weight == 0.0){
             return 1;
+        }
+
         return weight;
     }
 }

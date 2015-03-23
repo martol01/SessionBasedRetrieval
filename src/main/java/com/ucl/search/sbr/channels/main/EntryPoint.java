@@ -29,7 +29,7 @@ public class EntryPoint {
 
     private static final String host = "localhost";
     private static final String username = "root";
-    private static final String password = "gogaie";
+    private static final String password = "";
 
 
     public static void main(String args[]) {
@@ -52,9 +52,13 @@ public class EntryPoint {
 
 
         /** go through all the sessions */
+
+       // Session session = sessions[1000];
+
         for (Session session : sessions) {
             System.out.println("Session id: " + session.getId());
             Interaction[] interactions = session.getInteractions();
+            System.out.println(interactions.length + " nb of queries in session");
 
             /** stores (docId, <entityId, entityWeight in doc with docIds>); for each session we initialize a new hashMap(inside)*/
             Map<String, HashMap<String, Double>> entityWeight = new HashMap<>();
@@ -62,14 +66,13 @@ public class EntryPoint {
             /** stores (queryId, <docId, score(q,d)>); for each session initialise a new HashMap(inside one) */
             Map<String, HashMap<String, Double>> overallScorePerQuery = new HashMap<>();
 
-
             for (int i = 0; i < interactions.length; i++) {
 
                 if (i == 0) {
-                    System.out.println("in else: here the session has only one query");
+                    System.out.println("first query");
 
                     Entity[] entities = interactions[0].getEntities();
-                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getEntityQuery(), 10);
+                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[0].getEntityQuery(), 15);
 
                     /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId */
                     for (ParsedDocument doc : results) {
@@ -78,23 +81,21 @@ public class EntryPoint {
 
                         for (Entity e : entities) {
                             double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
-                            entityWeight.get(docId).put(e.getMid(), Math.log(entWeight));
+                            entityWeight.get(docId).put(e.getMid(), entWeight);
                         }
 
                     }
-
-                    // just printing the values -- delete this part later
-//                    for (String key : entityWeight.keySet()) {
-//                        for (String entityId : entityWeight.get(key).keySet()) {
-//                            System.out.println("map from docId -> (entityId, weightOfEntity)" + entityId + " ___ " + entityWeight.get(key).get(entityId));
-//                        }
-//                    }
 
                     HashMap<String, Double> scoreQueryDoc = new HashMap<>();
 
                     for (ParsedDocument doc : results) {
                         String docId = new String((byte[]) doc.metadata.get("docno"));
                         scoreQueryDoc.put(docId, overallScore.getNewScore(interactions[0], docId));
+                    }
+
+                    System.out.println("-------------------------------");
+                    for(String key: scoreQueryDoc.keySet()){
+                        System.out.println(scoreQueryDoc.get(key));
                     }
 
                     /* populate first entry corresponding to first query with the scores for each doc */
@@ -112,7 +113,7 @@ public class EntryPoint {
                     List<Entity> addedE = extractor.extractAddedEntities(interactions[i-1], interactions[i]);
                     List<Entity> removedE = extractor.extractRemovedEntities(interactions[i-1], interactions[i]);
 
-                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[i].getEntityQuery(), 10);
+                    ParsedDocument[] results = querySubmitter.getResultsForQuery(interactions[i].getEntityQuery(), 15);
 
                     /* for each document in results compute P(e|d) and store it in the HashMap for the correct docId
                     * if and only if that entity doesn't appear in the HashTable */
@@ -143,7 +144,7 @@ public class EntryPoint {
                             } else {
                                 /* HashMap doesn't contain the entity Id -> calculate the weight for the entity */
                                 double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
-                                entityWeight.get(docId).put(e.getMid(), Math.log(entWeight));
+                                entityWeight.get(docId).put(e.getMid(), entWeight);
                             }
                         }
 
@@ -159,7 +160,7 @@ public class EntryPoint {
 
                                 } else {
                                     double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
-                                    entityWeight.get(docId).put(e.getMid(), Math.log(entWeight));
+                                    entityWeight.get(docId).put(e.getMid(), entWeight);
                                 }
                             }
 
@@ -174,7 +175,7 @@ public class EntryPoint {
 
                                 } else {
                                     double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
-                                    entityWeight.get(docId).put(e.getMid(), Math.log(entWeight));
+                                    entityWeight.get(docId).put(e.getMid(), entWeight);
                                 }
                             }
                         }
@@ -186,7 +187,7 @@ public class EntryPoint {
                                 entityWeight.get(docId).put(e.getMid(), newWeight);
                             } else {
                                 double entWeight = currentWeight.getEntityProbabilityDoc(e, docId);
-                                entityWeight.get(docId).put(e.getMid(), Math.log(entWeight));
+                                entityWeight.get(docId).put(e.getMid(), entWeight);
                             }
                         }
                     }
@@ -201,6 +202,11 @@ public class EntryPoint {
                     }
 
                     overallScorePerQuery.put(interactions[i].getQuery(), scoreQueryDoc);
+
+                    System.out.println("-------------------------------");
+                    for(String key: scoreQueryDoc.keySet()){
+                        System.out.println(scoreQueryDoc.get(key));
+                    }
                 }
             }
 

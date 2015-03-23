@@ -37,7 +37,7 @@ public class MaxRewardDocExtractor {
      */
     public HashMap<String, Double> buildQueryDocScore(Interaction query) {
 
-        HashMap<String, Double> queryDocScore = new HashMap<>();
+        HashMap<String, Double> queryDocScore = new HashMap<String, Double>();
         double score;
 
         QuerySubmitter querySubmitter = new QuerySubmitter();
@@ -47,7 +47,6 @@ public class MaxRewardDocExtractor {
         for(ParsedDocument doc : results){
             String docId = new String((byte[])doc.metadata.get("docno"));
             score = relevanceScore.calculateCurrentRelevance(query, docId, MLE_BASED_SCORE);
-            // System.out.println("in maximing hashmap : score is: " + score);
             queryDocScore.put(docId, score);
         }
 
@@ -59,15 +58,17 @@ public class MaxRewardDocExtractor {
     public String getMaxRewardingDoc(HashMap<String, Double> scores) {
 
         String maxRewardingDocID = "";
-        Double maxRelevanceScore = Double.MIN_VALUE;
+        Double maxRelevanceScore = Double.NEGATIVE_INFINITY;
 
         for(String key : scores.keySet()){
+
             if(scores.get(key) > maxRelevanceScore){
                 maxRelevanceScore = scores.get(key);
                 maxRewardingDocID = key;
             }
         }
 
+        System.out.println(maxRewardingDocID + "  id is");
         return maxRewardingDocID;
     }
 
